@@ -1,0 +1,176 @@
+--- When using SR data, please cite us and provide a link and/or a mention.
+
+
+ 
+,,,Round 1,Round 1,,Totals,Totals,Totals,Totals,Totals,Shooting,Shooting,Shooting,Per Game,Per Game,Per Game,Per Game,Advanced,Advanced,Advanced,Advanced
+Rk,Pk,Tm,Player,College,Yrs,G,MP,PTS,TRB,AST,FG%,3P%,FT%,MP,PTS,TRB,AST,WS,WS/48,BPM,VORP
+1,1,MIL,Kent Benson,Indiana,11,680,15719,6168,3881,1203,.493,,.757,23.1,9.1,5.7,1.8,33.6,.103,0.2,8.8
+2,2,KCK,Otis Birdsong,Houston,12,696,21627,12544,2072,2260,.506,,.655,31.1,18.0,3.0,3.2,48.2,.107,0.6,14.3
+3,3,MIL,Marques Johnson,UCLA,11,691,23694,13892,4817,2502,.518,,.739,34.3,20.1,7.0,3.6,79.8,.162,3.3,31.7
+4,4,WSB,Greg Ballard,Oregon,11,802,22073,9953,4858,1733,.472,,.787,27.5,12.4,6.1,2.2,54.0,.117,1.2,18.1
+5,5,PHO,Walter Davis,UNC,15,1033,28859,19521,3053,3878,.511,,.851,27.9,18.9,3.0,3.8,76.9,.128,1.5,25.3
+6,6,LAL,Kenny Carr,NC State,10,674,17167,7813,4999,923,.510,,.684,25.5,11.6,7.4,1.4,33.6,.094,-1.5,2.3
+7,7,NJN,Bernard King,Tennessee,14,874,29417,19655,5060,2863,.518,,.730,33.7,22.5,5.8,3.3,75.4,.123,1.7,27.0
+8,8,SEA,Jack Sikma,Illinois Wesleyan University,14,1107,36943,17287,10816,3488,.464,,.849,33.4,15.6,9.8,3.2,112.5,.146,2.0,37.0
+9,9,DEN,Tom LaGarde,UNC,6,312,6194,2376,1593,456,.462,,.640,19.9,7.6,5.1,1.5,6.5,.050,-3.0,-1.6
+10,10,NYK,Ray Williams,Minnesota,10,655,18462,10158,2370,3779,.451,,.802,28.2,15.5,3.6,5.8,37.1,.096,1.6,16.8
+11,11,MIL,Ernie Grunfeld,Tennessee,9,693,12916,5124,1815,1419,.477,,.770,18.6,7.4,2.6,2.0,25.0,.093,-0.5,4.9
+12,12,BOS,Cedric Maxwell,UNC Charlotte,11,835,23769,10465,5261,1862,.546,,.784,28.5,12.5,6.3,2.2,78.5,.159,1.7,22.1
+13,13,CHI,Tate Armstrong,Duke,2,92,975,350,88,105,.454,,.800,10.6,3.8,1.0,1.1,0.3,.017,-3.1,-0.3
+14,14,ATL,Tree Rollins,Clemson,18,1156,24028,6249,6750,660,.522,,.700,20.8,5.4,5.8,0.6,63.9,.128,1.1,18.8
+15,15,LAL,Brad Davis,Maryland,15,961,22302,7866,1738,4709,.510,,.828,23.2,8.2,1.8,4.9,53.6,.115,0.1,12.1
+16,16,GSW,Rickey Green,Michigan,14,946,23271,8870,1819,5221,.469,,.807,24.6,9.4,1.9,5.5,47.2,.097,0.5,15.0
+17,17,WSB,Bo Ellis,Marquette,3,168,1984,613,482,113,.431,,.731,11.8,3.6,2.9,0.7,2.5,.060,-2.6,-0.3
+18,18,GSW,Wesley Cox,Louisville,2,74,813,342,206,23,.412,,.510,11.0,4.6,2.8,0.3,0.1,.007,-6.0,-0.9
+19,19,POR,Rich Laurel,Hofstra,1,10,57,24,10,3,.323,,1.000,5.7,2.4,1.0,0.3,0.0,-.034,-5.1,-0.1
+20,20,PHI,Glenn Mosley,Seton Hall,2,32,242,98,69,21,.409,,.578,7.6,3.1,2.2,0.7,0.2,.042,-2.9,-0.1
+21,21,DEN,Anthony Roberts,Oral Roberts,5,213,3867,1658,837,265,.412,,.699,18.2,7.8,3.9,1.2,3.3,.041,-4.2,-2.3
+22,22,LAL,Norm Nixon,Duquesne,10,768,27250,12065,1991,6386,.483,,.772,35.5,15.7,2.6,8.3,47.6,.084,-0.5,10.2
+23,23,CHI,Mike Glenn,Southern Illinois,10,593,9617,4496,710,952,.542,,.855,16.2,7.6,1.2,1.6,25.3,.126,0.3,5.6
+24,24,BUF,Larry Johnson,Kentucky,1,4,38,6,5,7,.231,,.000,9.5,1.5,1.3,1.8,-0.1,-.099,-2.9,0.0
+25,25,PHI,Wilson Washington,Old Dominion,2,100,1700,731,450,57,.497,,.605,17.0,7.3,4.5,0.6,2.1,.060,-2.4,-0.2
+26,26,NYK,Glen Gondrezick,UNLV,6,435,7545,2544,1964,605,.473,,.724,17.3,5.8,4.5,1.4,15.9,.101,0.2,4.2
+27,27,MIL,Glen Williams,St. John's,,,,,,,,,,,,,,,,,
+28,28,POR,Kim Anderson,Missouri,1,21,224,63,45,15,.312,,.536,10.7,3.0,2.1,0.7,-0.4,-.078,-7.5,-0.4
+29,29,IND,Alonzo Bradley,Texas Southern,3,99,1139,440,151,74,.418,,.703,11.5,4.4,1.5,0.7,-0.2,-.007,-4.6,-0.8
+30,30,CHI,Steve Sheppard,Maryland,2,106,977,367,178,62,.459,,.633,9.2,3.5,1.7,0.6,0.9,.045,-3.0,-0.2
+31,31,KCK,Eddie Owens,UNLV,1,8,63,21,10,5,.429,,.500,7.9,2.6,1.3,0.6,0.0,.027,-3.9,0.0
+32,32,NYK,Toby Knight,Notre Dame,4,283,7331,3640,1444,335,.519,,.740,25.9,12.9,5.1,1.2,15.7,.103,-0.9,2.1
+33,33,CLE,Eddie Jordan,Rutgers University,7,420,8507,3414,788,1595,.414,,.763,20.3,8.1,1.9,3.8,8.8,.050,-0.3,3.6
+34,34,HOU,Larry Moffett,UNLV,1,20,110,16,21,7,.294,,.600,5.5,0.8,1.1,0.4,-0.1,-.042,-4.6,-0.1
+35,35,CHI,Mark Landsberger,Arizona State,7,437,7306,2468,2681,236,.481,,.522,16.7,5.6,6.1,0.5,12.2,.080,-3.0,-1.9
+36,36,DET,Ben Poquette,Central Michigan University,10,718,15763,4899,3731,872,.483,,.779,22.0,6.8,5.2,1.2,30.4,.093,-0.7,5.3
+37,37,SAS,Jeff Wilkins,Illinois State,6,454,10004,3575,2574,462,.459,.000,.743,22.0,7.9,5.7,1.0,8.8,.042,-3.9,-4.8
+38,38,GSW,Ricky Love,,,,,,,,,,,,,,,,,,
+39,39,WSB,Phil Walker,Millersville,1,40,384,178,52,54,.354,,.667,9.6,4.5,1.3,1.4,-0.4,-.045,-4.6,-0.3
+40,40,HOU,Robert Reid,St. Mary's University,13,919,25109,10448,4168,2500,.458,,.732,27.3,11.4,4.5,2.7,40.3,.077,-0.7,8.2
+41,41,POR,T.R. Dunn,Alabama,14,993,23080,5033,4371,1631,.457,,.725,23.2,5.1,4.4,1.6,39.8,.083,0.0,11.5
+42,42,PHI,Bob Elliott,Arizona,3,141,2324,980,502,204,.494,,.649,16.5,7.0,3.6,1.4,3.0,.063,-2.1,0.0
+43,43,PHI,Herm Harris,Arizona,,,,,,,,,,,,,,,,,
+44,44,NOJ,Essie Hollis,St. Bonaventure,1,25,154,69,45,6,.400,,.750,6.2,2.8,1.8,0.2,0.1,.022,-4.3,-0.1
+45,45,KCK,Bill Paterno,Notre Dame,,,,,,,,,,,,,,,,,
+46,46,LAL,James Edwards,Washington,19,1168,28356,14862,6004,1499,.495,,.698,24.3,12.7,5.1,1.3,59.7,.101,-1.7,2.0
+47,47,MIL,Gary Yoder,Cincinnati,,,,,,,,,,,,,,,,,
+48,48,ATL,Sam Smith,UNLV,2,46,621,315,63,58,.419,,.862,13.5,6.8,1.4,1.3,1.1,.082,-1.0,0.2
+49,49,ATL,Eddie Johnson,Auburn,10,675,19975,10163,1522,3436,.476,,.791,29.6,15.1,2.3,5.1,41.0,.098,0.4,12.1
+50,50,NOJ,Tony Hanson,UConn,,,,,,,,,,,,,,,,,
+51,51,IND,Stan Mayhew,Weber State,,,,,,,,,,,,,,,,,
+52,52,SEA,Joe Hassett,Providence,6,292,3642,1723,307,386,.421,,.861,12.5,5.9,1.1,1.3,6.4,.084,-0.8,1.1
+53,53,KCK,John Kuester,UNC,3,135,1527,451,141,305,.427,,.833,11.3,3.3,1.0,2.3,2.0,.064,-1.9,0.1
+54,54,NYK,Lloyd McMillian,Cal State Long Beach,,,,,,,,,,,,,,,,,
+55,55,CLE,Steve Grote,Michigan,,,,,,,,,,,,,,,,,
+56,56,BOS,Skip Brown,Wake Forest,,,,,,,,,,,,,,,,,
+57,57,WSB,Steve Puidokas,Washington State,,,,,,,,,,,,,,,,,
+58,58,DET,John Irving,Hofstra,,,,,,,,,,,,,,,,,
+59,59,SAS,Dan Henderson,Arkansas State University,,,,,,,,,,,,,,,,,
+60,60,GSW,Marlon Redmond,San Francisco,2,77,1057,499,161,77,.423,,.655,13.7,6.5,2.1,1.0,0.6,.026,-2.8,-0.3
+61,61,WSB,Jerry Schellenberg,Wake Forest,,,,,,,,,,,,,,,,,
+62,62,HOU,Phil Bond,Louisville,1,7,21,4,4,2,.333,,,3.0,0.6,0.6,0.3,0.0,-.092,-4.5,0.0
+63,63,POR,Ricky Brown,Alabama,,,,,,,,,,,,,,,,,
+64,64,PHI,Arnold Dugger,Oral Roberts,,,,,,,,,,,,,,,,,
+65,65,DEN,Robert Smith,UNLV,7,229,3118,1135,288,401,.435,,.877,13.6,5.0,1.3,1.8,5.6,.086,-1.9,0.1
+66,66,PHO,Mike Bratz,Stanford,9,586,10613,4081,1030,1851,.407,,.830,18.1,7.0,1.8,3.2,11.1,.050,-1.8,0.6
+67,67,NJN,Bob Elmore,Wichita State,,,,,,,,,,,,,,,,,
+68,68,BUF,Melvin Watkins,UNC Charlotte,,,,,,,,,,,,,,,,,
+69,69,MIL,Lewis Brown,UNLV,1,2,5,2,2,0,.000,,.400,2.5,1.0,1.0,0.0,-0.1,-.667,-5.7,0.0
+70,70,ATL,Dave Bormann,Gardner-Webb University,,,,,,,,,,,,,,,,,
+71,71,PHO,Greg Griffin,Idaho State University,1,36,422,145,103,24,.361,,.639,11.7,4.0,2.9,0.7,-0.1,-.011,-6.5,-0.5
+72,72,NOJ,Dennis Boyd,Detroit Mercy,1,5,40,6,2,7,.250,,,8.0,1.2,0.4,1.4,-0.2,-.230,-6.4,-0.1
+73,73,IND,George Pendleton,Georgia State University,,,,,,,,,,,,,,,,,
+74,74,SEA,Jim Cooper,Alabama State University,,,,,,,,,,,,,,,,,
+75,75,KCK,Larry Williams,Texas Southern,,,,,,,,,,,,,,,,,
+76,76,NYK,Steve Hayes,Idaho State University,5,212,2296,545,526,85,.482,.000,.500,10.8,2.6,2.5,0.4,2.9,.061,-3.6,-0.9
+77,77,CLE,Melvin Jones,West Texas A&M University,,,,,,,,,,,,,,,,,
+78,78,BOS,Jeff Cummings,Tulane,,,,,,,,,,,,,,,,,
+79,79,CHI,Mike McConalthy,Louisiana Tech,,,,,,,,,,,,,,,,,
+80,80,DET,Bruce King,Iowa,,,,,,,,,,,,,,,,,
+81,81,SAS,Matt Hicks,Northern Illinois,,,,,,,,,,,,,,,,,
+82,82,GSW,Roy Smith,Kentucky State University,,,,,,,,,,,,,,,,,
+83,83,WSB,David Reavis,Georgia,,,,,,,,,,,,,,,,,
+84,84,HOU,Rocky Smith,Oregon State,,,,,,,,,,,,,,,,,
+85,85,POR,Greg White,USC,,,,,,,,,,,,,,,,,
+86,86,PHI,Jeff Jonas,Utah,,,,,,,,,,,,,,,,,
+87,87,GSW,Leartha Scott,University of Wisconsin-Parkside,,,,,,,,,,,,,,,,,
+88,88,LAL,Tony Robertson,West Virginia,2,75,1003,409,80,107,.435,,.694,13.4,5.5,1.1,1.4,0.4,.020,-2.4,-0.1
+89,89,NJN,Gerald Cunningham,Kentucky State University,,,,,,,,,,,,,,,,,
+90,90,BUF,Mike Hanley,Niagara University,,,,,,,,,,,,,,,,,
+91,91,MIL,Ron Norwood,DePaul,,,,,,,,,,,,,,,,,
+92,92,ATL,Bill Gordon,Chattanooga,,,,,,,,,,,,,,,,,
+93,93,PHO,Cecil Rellford,St. John's,,,,,,,,,,,,,,,,,
+94,94,NOJ,Jim Grady,Gonzaga,,,,,,,,,,,,,,,,,
+95,95,IND,Marvin Jackson,Prairie View A&M University,,,,,,,,,,,,,,,,,
+96,96,SEA,Dale Haverman,McKendree College,,,,,,,,,,,,,,,,,
+97,97,KCK,Bob Chapman,Michigan State,,,,,,,,,,,,,,,,,
+98,98,NYK,Bill Terry,Monmouth University,,,,,,,,,,,,,,,,,
+99,99,CLE,Al Smith,Jackson State University,,,,,,,,,,,,,,,,,
+100,100,BOS,Bill Langloh,Virginia,,,,,,,,,,,,,,,,,
+101,101,CHI,Nate Davis,South Carolina,,,,,,,,,,,,,,,,,
+102,102,DET,Jim Kennedy,Missouri,,,,,,,,,,,,,,,,,
+103,103,SAS,Scott Sims,Missouri,1,12,95,30,13,20,.385,,.667,7.9,2.5,1.1,1.7,-0.2,-.088,-5.7,-0.1
+104,104,GSW,Ray Epps,Norfolk State,1,13,72,26,5,2,.435,,.750,5.5,2.0,0.4,0.2,0.1,.057,-4.2,0.0
+105,105,WSB,Bruce Parkinson,Purdue,,,,,,,,,,,,,,,,,
+106,106,HOU,Ed Thompson,Idaho State University,,,,,,,,,,,,,,,,,
+107,107,POR,Donn Wilber,La Salle,,,,,,,,,,,,,,,,,
+108,108,PHI,Teko Wynder,Tulsa,,,,,,,,,,,,,,,,,
+109,109,DEN,John Billips,Ole Miss,,,,,,,,,,,,,,,,,
+110,110,LAL,John Robinson,Michigan,,,,,,,,,,,,,,,,,
+111,111,NJN,Mark Crow,Duke,1,15,154,84,27,8,.438,,.700,10.3,5.6,1.8,0.5,0.2,.051,-3.2,0.0
+112,112,BUF,Curvan Lewis,Virginia Union University,,,,,,,,,,,,,,,,,
+113,113,MIL,Chuck Goodyear,Miami University,,,,,,,,,,,,,,,,,
+114,114,ATL,Calvin Crews,Louisiana,,,,,,,,,,,,,,,,,
+115,115,PHO,Billy McKinney,Northwestern,7,476,9189,3823,677,1661,.493,,.820,19.3,8.0,1.4,3.5,15.6,.082,-1.2,1.7
+116,116,NOJ,Wayne Golden,Chattanooga,,,,,,,,,,,,,,,,,
+117,117,IND,Tom Scheffler,Purdue,1,39,268,52,76,11,.412,,.500,6.9,1.3,1.9,0.3,0.2,.037,-4.5,-0.2
+118,118,SEA,Bucky O'Brien,Seattle University,,,,,,,,,,,,,,,,,
+119,119,KCK,Bob Cooper,Providence,,,,,,,,,,,,,,,,,
+120,120,NYK,Jerry Craycraft,Milligan College,,,,,,,,,,,,,,,,,
+121,121,CLE,Ron Cox,Eastern Washington,,,,,,,,,,,,,,,,,
+122,122,BOS,Roy Pace,Rutgers University-Camden,,,,,,,,,,,,,,,,,
+123,123,CHI,Jay Cheesman,BYU,,,,,,,,,,,,,,,,,
+124,124,DET,Herb Nobles,Kansas,,,,,,,,,,,,,,,,,
+125,125,SAS,Bruce Buckley,UNC,,,,,,,,,,,,,,,,,
+126,126,GSW,Jack Phelan,Saint Francis University,,,,,,,,,,,,,,,,,
+127,127,WSB,Ernie Wansley,Virginia Tech,,,,,,,,,,,,,,,,,
+128,128,POR,Myron Jordan,University of the Pacific,,,,,,,,,,,,,,,,,
+129,129,PHI,George Gibson,Winston-Salem State,,,,,,,,,,,,,,,,,
+130,130,DEN,Jim Town,UMass,,,,,,,,,,,,,,,,,
+131,131,LAL,Grover Woolard,Murray State,,,,,,,,,,,,,,,,,
+132,132,NJN,Scott Conant,Newberry College,,,,,,,,,,,,,,,,,
+133,133,BUF,Mike Jackson,Tennessee,,,,,,,,,,,,,,,,,
+134,134,MIL,Ron Bostick,Detroit Mercy,,,,,,,,,,,,,,,,,
+135,135,ATL,James Holliman,Arizona State,,,,,,,,,,,,,,,,,
+136,136,PHO,Alvin Scott,Oral Roberts,8,627,10853,3088,1992,847,.481,,.733,17.3,4.9,3.2,1.4,23.0,.102,0.2,5.9
+137,137,NOJ,Lusia Harris,Delta State University,,,,,,,,,,,,,,,,,
+138,138,SEA,Billy Reynolds,Northwestern State University,,,,,,,,,,,,,,,,,
+139,139,KCK,Caitlyn Jenner,Graceland University,,,,,,,,,,,,,,,,,
+140,140,NYK,Tom Weadock,St. John's,,,,,,,,,,,,,,,,,
+141,141,CLE,Bob Riddle,Eastern Michigan,,,,,,,,,,,,,,,,,
+142,142,BOS,Dave Kyle,Cleveland State University,,,,,,,,,,,,,,,,,
+143,143,CHI,Mike Smith,University of Evansville,,,,,,,,,,,,,,,,,
+144,144,DET,Robert Lewis,Johnson C. Smith University,,,,,,,,,,,,,,,,,
+145,145,SAS,Richard Robinson,New Mexico,,,,,,,,,,,,,,,,,
+146,146,GSW,Jerry Thruston,Mercer University,,,,,,,,,,,,,,,,,
+147,147,WSB,Calvin Brown,American University,,,,,,,,,,,,,,,,,
+148,148,POR,Don Smith,Oregon State,,,,,,,,,,,,,,,,,
+149,149,PHI,Dennis Forrest,Nebraska-Omaha,,,,,,,,,,,,,,,,,
+150,150,DEN,Willie High,Alabama State University,,,,,,,,,,,,,,,,,
+151,151,LAL,Lars Hansen,Washington,1,15,205,76,59,14,.509,,.581,13.7,5.1,3.9,0.9,0.6,.149,-1.3,0.1
+152,152,NJN,Ralph Drollinger,UCLA,1,6,67,15,19,14,.500,,.250,11.2,2.5,3.2,2.3,-0.2,-.117,-4.1,-0.1
+153,153,BUF,Emery Sammons,Philadelphia University,,,,,,,,,,,,,,,,,
+154,154,MIL,Larry Pikes,UW-Milwaukee,,,,,,,,,,,,,,,,,
+155,155,ATL,Verne Thompson,BYU,,,,,,,,,,,,,,,,,
+156,156,PHO,Alvin Joseph,University of California Riverside,,,,,,,,,,,,,,,,,
+157,157,NOJ,Dave Speicher,Toledo,,,,,,,,,,,,,,,,,
+158,158,SEA,Jeff Frey,University of Evansville,,,,,,,,,,,,,,,,,
+159,159,NYK,Ken Slappy,Saint Peter's College,,,,,,,,,,,,,,,,,
+160,160,CLE,Tom Cutter,Western Michigan,,,,,,,,,,,,,,,,,
+161,161,BOS,Tom Harris,Bowling Green,,,,,,,,,,,,,,,,,
+162,162,CHI,Rich Rhodes,Eastern Illinois University,,,,,,,,,,,,,,,,,
+163,163,DET,Tim Appleton,Kenyon College,,,,,,,,,,,,,,,,,
+164,164,SAS,Jerome Gladney,Arizona,,,,,,,,,,,,,,,,,
+165,165,GSW,Ricky Marsh,Manhattan University,1,60,851,269,75,90,.426,,.697,14.2,4.5,1.3,1.5,0.5,.028,-3.1,-0.2
+166,166,WSB,Pat McKinley,Towson University,,,,,,,,,,,,,,,,,
+167,167,POR,Harold Rhodes,Washington,,,,,,,,,,,,,,,,,
+168,168,PHI,John Olive,Villanova,2,35,204,44,20,3,.310,,.783,5.8,1.3,0.6,0.1,-0.2,-.058,-6.4,-0.3
+169,169,DEN,Len Sanders,Florida,,,,,,,,,,,,,,,,,
+170,170,LAL,Art Allen,Pepperdine,,,,,,,,,,,,,,,,,

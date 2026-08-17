@@ -10,7 +10,14 @@ Approach:
    recent data is the least likely to be distorted by long-gone rule/pace
    eras.
 2. For a range of candidate start years, build the same delta curve using
-   data from [candidate_start_year, 2024].
+   data from [candidate_start_year, REFERENCE_START - 1] -- i.e. ending
+   the year BEFORE the reference window starts, so candidate and reference
+   windows never share any seasons. (An earlier version of this script ran
+   candidate windows through 2024, which meant candidate and reference
+   windows increasingly overlapped as the candidate start year approached
+   the reference start year -- artificially forcing divergence toward zero
+   regardless of whether the underlying eras were actually similar. Fixed
+   here.)
 3. Compute a single divergence score between each candidate curve and the
    reference curve (sum of squared differences across matched age-transition
    buckets, restricted to age brackets present in both).
@@ -35,22 +42,46 @@ import matplotlib.pyplot as plt
 # ---- Config ----
 INPUT_FILE = "player_metrics.csv"
 CATEGORIES = [
-    "PTS_per36", "TRB_per36", "ORB_per36", "DRB_per36",
+    "PTS_per36", "TRB_per36",
     "AST_per36", "STL_per36", "BLK_per36", "TOV_per36", "PF_per36", "TS_pct",
 ]
-# NOTE: adjust CATEGORIES above if your z-score column names differ --
-# this script expects a "<category>_z" column per entry (same convention
-# as delta_curves_exploratory.py). If your 8 core categories use different
-# base names, edit this list to match player_metrics.csv's actual columns.
+# NOTE: ORB_per36 / DRB_per36 have raw per-36 columns in player_metrics.csv
+# but no _z (z-score) columns -- compute_metrics.py only z-scored the 8
+# core categories above (ORB/DRB are folded into combined TRB_per36_z).
+# Adjust this list if that changes.
 
 N_CUTOFF = 20          # sample-size floor per age-transition bucket (locked in step 2)
 REFERENCE_START = 2005 # reference window: 2005-2024
 REFERENCE_END = 2024
-CANDIDATE_START_YEARS = list(range(1950, 2001, 5))  # 1950, 1955, ..., 2000
-CANDIDATE_END = 2024
+# IMPORTANT: candidate windows must end BEFORE REFERENCE_START, with no
+# overlap. An earlier version ran candidate windows through 2024 (shared
+# seasons with the reference window, artificially forcing divergence
+# toward zero). That was fixed by capping candidate windows at
+# REFERENCE_START - 1 -- but that introduced a NEW problem: candidate
+# windows starting later ended up much shorter (e.g. 1985-2004 = 20 years
+# of data vs. 2003-2004 = 2 years of data), so later candidates looked
+# "more different" from the reference partly just from being noisier
+# small samples, not necessarily because that era was truly different.
+#
+# Fix: every candidate window is now a FIXED length (WINDOW_LENGTH_YEARS),
+# sliding across history in WINDOW_STEP_YEARS increments, always ending
+# before REFERENCE_START. This keeps sample size roughly comparable across
+# candidates, so differences in divergence reflect the era, not the amount
+# of data.
+WINDOW_LENGTH_YEARS = 10  # each candidate window covers this many years
+WINDOW_STEP_YEARS = 2     # slide the window forward by this many years each step
 
-OUTPUT_CHART = "era_divergence_by_start_year.png"
-OUTPUT_TABLE = "era_divergence_table.csv"
+CANDIDATE_END = REFERENCE_START - 1  # 2004: last year with zero overlap vs. reference
+# Candidate start years: slide a 10-year window back from just-before-2005,
+# in 2-year steps, back through the mid-1980s.
+CANDIDATE_START_YEARS = list(range(
+    CANDIDATE_END - WINDOW_LENGTH_YEARS + 1,  # e.g. 1995 (window: 1995-2004)
+    1983, -WINDOW_STEP_YEARS
+))
+CANDIDATE_START_YEARS.sort()
+
+OUTPUT_CHART = "era_divergence_fixed_window_v3.png"
+OUTPUT_TABLE = "era_divergence_fixed_window_v3.csv"
 
 
 def build_delta_curve(df, start_year, end_year, category_z_col, n_cutoff):
@@ -121,17 +152,19 @@ def main():
               f"{len(ref_curve)} age-transition buckets with n>={N_CUTOFF}")
 
         for start_year in CANDIDATE_START_YEARS:
-            cand_curve = build_delta_curve(df, start_year, CANDIDATE_END, z_col, N_CUTOFF)
+            end_year = min(start_year + WINDOW_LENGTH_YEARS - 1, CANDIDATE_END)
+            cand_curve = build_delta_curve(df, start_year, end_year, z_col, N_CUTOFF)
             score, n_matched = divergence(cand_curve, ref_curve)
             results.append({
                 "category": cat,
                 "start_year": start_year,
+                "end_year": end_year,
                 "divergence": score,
                 "n_matched_ages": n_matched,
             })
-            print(f"  start={start_year}: divergence={score:.4f} "
+            print(f"  {start_year}-{end_year}: divergence={score:.4f} "
                   f"({n_matched} matched age buckets)" if not np.isnan(score)
-                  else f"  start={start_year}: no overlapping age buckets -- skipped")
+                  else f"  {start_year}-{end_year}: no overlapping age buckets -- skipped")
 
     results_df = pd.DataFrame(results)
     results_df.to_csv(OUTPUT_TABLE, index=False)
@@ -144,7 +177,7 @@ def main():
         cat_data = results_df[results_df["category"] == cat].sort_values("start_year")
         ax.plot(cat_data["start_year"], cat_data["divergence"], marker="o", label=cat)
 
-    ax.set_xlabel("Candidate window start year (window runs start_year-2024)")
+    ax.set_xlabel(f"Candidate window start year (each window is {WINDOW_LENGTH_YEARS} years long)")
     ax.set_ylabel(f"Divergence from reference curve ({REFERENCE_START}-{REFERENCE_END})")
     ax.set_title("Curve divergence vs. candidate fitting-window start year")
     ax.axhline(0, color="black", linewidth=0.8)

@@ -33,6 +33,12 @@ NBA_Projector/
     ├── patch_pre1958_ages.py         <- fills the 6 pre-1958 missing ages
     ├── attach_player_ids.py          <- attaches player_id, corrects ages (3-pass match)
     ├── compute_metrics.py            <- per-36 rates, TS%, era z-scores/ratios
+    ├── delta_curves_exploratory.py   <- delta-method exploration, n>=20 cutoff
+    ├── delta_curves_era_compare.py   <- early era-window divergence test (superseded, kept for record)
+    ├── select_category_fitting_windows.py  <- per-category fitting-window selection
+    ├── build_aging_curves.py         <- FINAL: builds the actual aging curves per category
+    ├── aging_curves.csv              <- output: age 18-45 x 8 categories, delta + cumulative z
+    ├── aging_curves.png              <- output: chart, one subplot per category
     ├── historical_clean.csv
     ├── recent_aggregated.csv
     ├── recent_with_age.csv
@@ -355,32 +361,38 @@ the project owner on their own machine:
   (TS% matches to within 0.0005; Spearman correlations all positive
   and in the expected range).
 
-**The actual next step: curve-fitting itself has NOT started.**
-Everything below is still ahead:
+**Curve-fitting window selection: DONE (category-specific, not
+universal).** The original plan assumed one shared fitting-window start
+year (1976 merger, or 1980 Bird/Magic) for all 8 stat categories. That
+assumption was tested empirically rather than taken on faith -- see
+"Fitting-window selection methodology" below -- and rejected: different
+categories turned out to need meaningfully different historical
+windows. Each of the 8 core categories now has its own selected start
+year (table in that section).
 
-1. **Re-run the era-trends chart and delta-method exploration on the
-   now-fully-corrected data.** Both were built and run earlier in this
-   session, but BEFORE the TOT-collapse fix and player_id/age
-   corrections above -- `era_trends.png` and `delta_table.csv` /
-   `delta_curves_compare.png` are now stale (only 91 rows changed, so
-   unlikely to look meaningfully different, but not yet re-verified).
-   Scripts already exist (`plot_era_trends.py`,
-   `delta_curves_exploratory.py`) -- just need to be re-run and
-   re-reviewed.
-2. **Decide the min-n sample-size cutoff for age-transition buckets**
-   in the delta method, using the comparison chart from step 1 (this
-   was the original question this session set out to answer before
-   the data-quality investigation took over).
-3. **Decide the primary fitting window** -- 1976/1980-onward per
-   earlier discussion, or something else, informed by the era-trends
-   chart.
-4. **Build the actual delta-method curve-fitting** (not the exploratory
-   version) for all 8 core stat categories, incorporating the
-   min-n/window decisions above.
-5. **Empirically test the 2000/2010/2015 era-break candidates** against
-   the fitted curves.
-6. Only after all of the above: Module 2 is complete and Module 3
-   (rookie/new-player projection) can start.
+**Aging curves: DONE.** Full delta-method aging curves (age 18-45) built
+for all 8 core categories, each using its own selected fitting window,
+with unreliable tail ages (below the n>=20 sample-size floor) handled
+via extrapolation rather than fit directly on noisy small samples --
+see "Aging curve construction" below. Independently verified: the
+project owner's local run produced byte-for-byte identical
+`cumulative_z` values against the server-generated reference (0 rows
+differing across all 224 category/age rows).
+
+**Era-boundary testing (2000/2010/2015 candidates): CLOSED, subsumed by
+the fitting-window scan above.** See "Era-boundary testing" note below
+for reasoning -- the continuous per-category scan already tested this
+question more thoroughly than three discrete candidate years would
+have, and found no category needed a boundary anywhere near 2000-2015.
+
+**The actual next step:** curve-fitting (the core of Module 2) is done.
+Remaining before Module 2 is fully closed out:
+1. Decide whether the survival/retention question raised by the
+   project owner (see "Known gaps" below) gets built now as part of
+   Module 2, or deferred to Module 7 where it will actually get
+   consumed.
+2. Final review/sign-off that Module 2 is complete, then start Module 3
+   (rookie/new-player projection).
 
 
 
@@ -459,20 +471,230 @@ for 2018-2024):**
   These aren't formal validation, but real, named, correctly-behaving
   data points are a useful gut-check alongside the numeric checks above.
 
-**Primary fitting window: 1976 (merger) or 1980 (Bird/Magic) onward,
-full 1950+ history kept as a robustness check only.** Rationale:
+**Primary fitting window: category-specific, determined empirically --
+see "Fitting-window selection methodology" below.** Originally planned
+as one shared window (1976 merger or 1980 Bird/Magic onward, full
+1950+ kept only as a robustness check), on the rationale that
 league pace/rules changed too much pre-merger to trust directly in a
-combined fit; normalizing against seasonal league averages (per
-earlier discussion) should handle most of this, but a modern anchor
-window is still the primary fit.
+combined fit. That single-window assumption was tested rather than
+taken on faith and did not hold up -- different stat categories showed
+meaningfully different sensitivity to how far back the fitting window
+reached, so each of the 8 core categories now gets its own
+independently-selected start year instead of one shared boundary.
 
-**Era-boundary testing: empirical, not assumed.** Project owner's
-hypothesis is that pro basketball changed meaningfully around 2010.
-Rather than hard-coding a 2010 split, the plan is to test multiple
-candidate break years (2000, 2010, 2015) against the fitted curves and
-report what the data actually shows, rather than assume the boundary.
-*NOT YET DONE -- metric computation (the prerequisite) is now complete;
-this depends on curve-fitting itself, which hasn't started.*
+**Era-boundary testing: empirical, not assumed -- CLOSED.** Project
+owner's original hypothesis was that pro basketball changed
+meaningfully around 2010, originally planned as a test of specific
+candidate break years (2000, 2010, 2015) against the fitted curves.
+Decided this is unnecessary as a separate step: the fitting-window scan
+(below) already tested a continuous range of candidate years per
+category -- strictly more thorough than three discrete candidates would
+have been -- and found no category needed a boundary anywhere near
+2000-2015 (latest selected start year across all 8 categories is 1977).
+That's a real, informative answer to the original hypothesis (the data
+doesn't support a ~2010 break), not a gap. One honest limitation worth
+naming: because the reference window itself is 2005-2024, this
+approach structurally can't detect a break *within* that range (e.g.
+"did something shift in 2015 that makes recent years different from
+2005-2014") -- a candidate window can't be tested against a reference
+window it overlaps with, for the same reason overlapping windows were
+rejected earlier. Not currently blocking anything; flagged here in case
+it matters later.
+
+### Fitting-window selection methodology
+
+**The question:** how far back should the historical data reach when
+fitting each stat category's aging curve? Two competing failure modes:
+reach back too far and risk blending in eras where the game was
+different enough to distort the curve; reach back too little and lose
+real signal/sample size for no reason.
+
+**Approach, in the order actually worked through (including two
+methodology bugs caught along the way -- kept documented rather than
+silently fixed, since the fixes are as instructive as the final
+result):**
+
+1. **First attempt -- divergence vs. candidate start year, overlapping
+   windows.** For each stat category, built a delta-method aging curve
+   (age-transition deltas in z-score units, n>=20 sample-size floor)
+   using only the most recent 20 years (2005-2024) as a trusted
+   "reference" curve. Then built the same curve for a range of
+   candidate start years, each candidate window running from that
+   start year through **2024** (same end year as the reference), and
+   measured divergence (sum of squared differences across matched
+   age-transition buckets) between each candidate and the reference.
+   **Bug found:** as a candidate's start year approached 2005, its
+   window increasingly overlapped the reference window itself (e.g. a
+   candidate starting in 2003 shared 20 of the reference's 22 years),
+   mechanically forcing divergence toward zero regardless of whether
+   the underlying eras were actually similar -- an artifact of
+   comparing a dataset partly to itself, not a real finding.
+2. **Second attempt -- non-overlapping windows, still variable
+   length.** Fixed the overlap bug by capping every candidate window at
+   2004 (the year before the reference window starts), so no candidate
+   ever shares a season with the reference. **Second bug found:** this
+   made candidate windows variable-length -- an early start year like
+   1985 covered 20 years of data (1985-2004), while a late start year
+   like 2003 covered only 2 years (2003-2004). Later candidates looked
+   "more different" from the reference partly because they were
+   smaller, noisier samples, not necessarily because that specific era
+   was truly different -- a second confound, distinct from the first.
+3. **Third attempt -- fixed-length, non-overlapping sliding windows.**
+   Every candidate window became a fixed 15 years long, sliding across
+   history in 1-year steps, always ending by 2004. This removed both
+   confounds: no overlap with the reference, and every candidate window
+   carries roughly the same amount of data.
+4. **Noise-smoothing.** Even with both confounds fixed, raw divergence
+   still bounced up and down noisily year-to-year -- a single low point
+   could reflect a real stable era, or just a lucky year sandwiched
+   between worse ones on either side. Divergence was smoothed with a
+   centered 5-year rolling average before selection, so the selection
+   rule locks onto genuinely stable historical stretches rather than
+   isolated dips. (Both raw and smoothed divergence are kept in
+   `category_divergence_fine_scan_smoothed.csv` for inspection.)
+5. **Selection rule (applied per category, to the smoothed curve):**
+   find the lowest (best) smoothed divergence anywhere in the scan,
+   then walk backward through history to the *earliest* start year
+   whose smoothed divergence is still within **25%** of that best
+   score. This directly answers "how far back can this category reach
+   while staying close to modern behavior" with one consistent,
+   auditable rule applied identically across all 8 categories, rather
+   than 8 separate eyeballed judgment calls.
+
+**Result -- selected fitting-window start year per category** (each
+window runs from the listed year through the present; full detail in
+`category_fitting_windows_selected_smoothed.csv`):
+
+| Category | Selected start year |
+|---|---|
+| TRB_per36 | 1958 |
+| PF_per36 | 1958 |
+| AST_per36 | 1963 |
+| TS_pct | 1961 |
+| TOV_per36 | 1970 |
+| STL_per36 | 1974 |
+| BLK_per36 | 1976 |
+| PTS_per36 | 1977 |
+
+**Key finding: no single universal window fits all categories well.**
+Selected start years range from 1958 to 1977 -- confirming a
+category-specific approach was the right call, not just extra
+complexity for its own sake. Rebounding, fouls, assists, and shooting
+efficiency show stable aging patterns reaching back to the late
+1950s/early 1960s; steals, blocks, turnovers, and scoring show more
+sensitivity to more recent eras, plausibly tied to real rule changes
+(illegal defense rules phased out ~2001, hand-checking rules tightened
+2004-2005) that directly govern how those specific stats are produced.
+
+**Honest caveats:**
+- ORB_per36 / DRB_per36 have raw per-36 columns in `player_metrics.csv`
+  but no `_z` (z-score) columns -- `compute_metrics.py` only z-scored
+  the 8 core categories above, folding ORB/DRB into the combined
+  `TRB_per36_z`. If ORB/DRB ever need their own z-scores and windows,
+  `compute_metrics.py` needs to be extended first.
+- The "matched age buckets" count varies (14-20) across candidate
+  windows depending on how many age-transition buckets clear the n>=20
+  floor within a given 15-year span -- not a bug, just a natural
+  consequence of shorter historical windows having less data per age
+  bucket.
+- AST_per36's selected year (1963) moved the most from the pre-smoothing
+  result (1981) -- checked directly against the chart and confirmed
+  it's a genuine wide, stable plateau, not a smoothing artifact.
+
+**Scripts (run from `aging/`, after `player_metrics.csv` exists):**
+```
+python delta_curves_era_compare.py          # earlier, overlapping-window version (bugs #1-#2 above, kept for the record)
+python select_category_fitting_windows.py   # final version: fixed 15yr windows, 5yr smoothing, per-category selection
+```
+`select_category_fitting_windows.py` writes:
+- `category_divergence_fine_scan_smoothed.csv` -- full raw scan, all
+  categories x all candidate years, both raw and smoothed divergence
+- `category_fitting_windows_selected_smoothed.csv` -- one row per
+  category: selected start year, divergence at that point, best
+  possible divergence
+- `category_divergence_fine_scan_smoothed.png` -- chart, faded=raw,
+  bold=smoothed, marker at each category's selected start year
+
+### Aging curve construction (`build_aging_curves.py`)
+
+**What it builds:** one full delta-method aging curve per category,
+covering ages 18-45, using each category's own selected fitting window
+from the table above (running through the present, 2024 -- not capped
+at 2004 like the window-selection scans were, since this is the real
+fit rather than a comparison against a reference).
+
+**Core method (already locked in from earlier steps):** mean z-score
+delta per age-transition bucket (age X -> age X+1), computed only over
+each category's selected data window, with the same n>=20
+sample-size floor used throughout. Deltas are converted into an actual
+curve via cumulative sum, anchored at age 22 = 0.0 (matching the anchor
+used in the earlier exploratory chart, `delta_curves_compare.png`).
+
+**Handling ages below the n>=20 floor (mostly age 18-19, and the late
+30s/40s):** rather than fit these directly on tiny, noisy samples (per
+project owner's earlier call), they're extrapolated from the reliable
+"core" curve:
+- **Young tail** (below the youngest reliable age): linear
+  extrapolation, with both the starting value and the slope estimated
+  from the youngest 3 reliable age-transition deltas (a small linear
+  fit across those points), not just the single youngest one.
+- **Old tail** (above the oldest reliable age): decay-toward-zero
+  extrapolation -- starting from the average of the oldest 3 reliable
+  deltas, each additional transition beyond that decays by a fixed
+  `DECAY_RATE = 0.7` per step, so the decline itself slows and
+  asymptotes rather than continuing in a straight line forever (which
+  would eventually predict impossible things, like negative
+  production). Reflects that a player still active at 40+ is by
+  definition an outlier, not declining at a typical veteran's rate.
+
+**A bug caught and fixed during review, before this was finalized:**
+the first version anchored each tail's extrapolation on a *single*
+edge value (the youngest or oldest reliable delta) rather than an
+average of several. This produced a visibly wrong result for
+`PF_per36`: its single oldest reliable delta (age 37->38, n=46) was
+0.623 -- nearly double any nearby value, an outlier almost certainly
+caused by a small, survivorship-biased sample right at the cutoff
+boundary (very few players are still active at 38, and the ones who
+are may not represent a "typical" aging pattern). Anchoring the decay
+on that one noisy point produced an implausible tail that kept
+climbing to +3.2 in cumulative z-score terms by age 45 instead of
+leveling off. **Fix:** both tails now anchor on the *average* of the
+youngest/oldest 3 reliable deltas instead of a single point, which
+smooths out exactly this kind of edge noise while preserving the real
+trend direction. Re-running with the fix brought PF_per36's age-45
+value down to a much more plausible +2.6, with a visibly gentler
+climb.
+
+**Result -- final aging curves for all 8 categories**, all following
+sensible basketball shapes: rise into peak years (typically low-to-mid
+20s, varies by category), then steady decline flattening out at the
+extrapolated tail rather than diverging. See `aging_curves.png` for the
+full set (2x4 grid, one subplot per category, solid line = reliable
+core data, dashed line = extrapolated tail).
+
+**Validation:** independently re-run by the project owner on their own
+machine after the anchoring fix; `aging_curves.csv` matched the
+server-generated reference exactly (0 rows differing in `cumulative_z`
+across all 224 category/age rows).
+
+**Deliberately NOT included in this curve, flagged for later:**
+survival/retention (the probability a player is still active in the
+league at a given age at all) -- see "Known gaps" below. The curve
+built here is *conditional* ("given a player is still active at age X,
+how does production change by X+1"), not a survival curve. Mixing the
+two into one number was considered and rejected -- see that section for
+the reasoning.
+
+**Script (run from `aging/`, after `player_metrics.csv` exists):**
+```
+python build_aging_curves.py
+```
+Writes:
+- `aging_curves.csv` -- one row per (category, age): the age-to-next-age
+  delta, the cumulative z-score curve value, whether that row was
+  extrapolated, and the underlying sample size (NaN if extrapolated).
+- `aging_curves.png` -- one subplot per category, solid=reliable core,
+  dashed=extrapolated tails.
 
 ### Data sources
 - **1950-2017 (`historical_clean.csv`):** originally scraped from
@@ -611,7 +833,27 @@ file; nothing clean found that's reachable from this environment
 snapshots). Deferred -- project owner has better direct access to
 source this and will handle it when we return to this piece.
 
-**2. 2018-2024 age gap -- RESOLVED.** Originally 752 players / 42.9% of
+**2. No survival/retention curve -- deferred, scope not yet decided.**
+Raised by the project owner while reviewing the aging curves: the
+delta-method curve built here is *conditional* -- "given a player is
+still active in the league at age X, how does production typically
+change by X+1." It says nothing about the *probability* a player is
+still active at age X at all, which thins out a lot by the late 30s
+(the same small-sample tail visible in `aging_curves.png`'s dashed
+sections). That's a genuinely separate, useful piece of information --
+a survival/retention curve (roughly: count of active players at age X
+divided by count at age X-1, per category or overall) -- but mixing it
+into the conditional performance curve would be a modeling mistake, not
+an improvement: it would double-count the same signal in the wrong
+place, and would incorrectly drag down the projected performance of
+the specific players who *do* survive to a given age (the reason
+they're still playing is often that they're still good, not that
+they're a random draw from the full population). Deliberately not
+built now, to avoid disrupting the module-by-module build order --
+likely candidate for later in Module 2, or Module 7 (individual player
+projection engine), whichever actually ends up consuming it.
+
+**3. 2018-2024 age gap -- RESOLVED.** Originally 752 players / 42.9% of
 2018-2024 minutes had no age (true post-2017 debuts with no anchor in
 the historical file). Project owner supplied their own full-history
 (1947-2026) age-by-player-by-season export, which closed the gap to
@@ -627,7 +869,7 @@ Reynolds, Nate Williams, Matt Hurt, Mitchell Creek, Vincent Edwards,
 Filip Petrusev, Vincent Hunter, Jamie Echenique) -- negligible, not
 worth chasing further.
 
-**3. Pre-1958 age gap -- RESOLVED.** After rebuilding
+**4. Pre-1958 age gap -- RESOLVED.** After rebuilding
 `unified_player_seasons.csv` (see mislabeled-file bug above), 6
 player-seasons across 5 players were found still missing age: Bob
 Schafer (1956, 1957), Don Bielke (1956), Frank Reddout (1954), Ken
