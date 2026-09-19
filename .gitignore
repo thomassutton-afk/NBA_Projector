@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+_raw_nbaNew.csv
+_raw_box_scores_part_1.csv
+_raw_box_scores_part_2.csv
+_raw_box_scores_part_3.csv

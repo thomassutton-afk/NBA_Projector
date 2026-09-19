@@ -1,47 +1,37 @@
 # NBA Standings Projector
 
-> ## ⚠️ CRITICAL OPEN ISSUE -- READ FIRST
-> **`player_metrics.csv` (and likely `unified_player_seasons.csv` beneath
-> it) appears to have a severe player-coverage gap starting in 2018.**
-> New player debuts per season fall off a cliff: ~71/year average
-> 2009-2017, then 11 in 2018, then ~2/year 2019-2023. Total active
-> players per season craters from ~455 (2017) to 141 (2024) -- consistent
-> with existing players simply retiring while almost no new players get
-> added to the dataset. Confirmed concretely: **Bam Adebayo (drafted
-> 2017, active All-Star through the 2025-26 season) does not appear
-> anywhere in `player_metrics.csv`.**
+> ## ✅ RESOLVED -- 2018+ player-coverage gap (was: CRITICAL OPEN ISSUE)
+> **Root cause confirmed and fixed.** `build_player_dataset.py`'s
+> original age-assignment logic could only give a 2018+ player an age by
+> carrying it forward from a pre-2018 historical row -- so any player
+> whose *entire* career started in 2018 or later (753 players, ~1.7M
+> minutes, including Bam Adebayo) had no anchor, got `Age = NaN`, and
+> was silently excluded from `recent_with_age.csv` /
+> `unified_player_seasons.csv` / `player_metrics.csv`.
 >
-> This was discovered while building Module 3 (see that section below)
-> when a large, suspicious cluster of "unmatched" 2010-2026 draft picks
-> turned out to be real NBA players simply missing from the dataset
-> entirely -- not a name-matching problem.
+> **Fix:** `build_player_dataset.py` now assigns age via a **direct
+> (name, season) lookup** against `AllPlayerDataforIDs.txt` (a
+> full-history 1947-2026 name/age/team roster the project owner
+> provided) instead of carrying forward from a historical anchor. This
+> covers every 2018+ debut, not just ones with a pre-2018 row to anchor
+> from. After resolving known nickname mismatches (e.g. "Cam Reynolds"
+> vs. "Cameron Reynolds"), the reference file's own `(YY)`
+> same-name-disambiguation tags (stripped only where doing so introduces
+> no season-overlap ambiguity -- see script docstring), and one mononym
+> case (Nenê), **2018-2026 minutes coverage is 100.0%**, confirmed
+> independently on the project owner's own machine.
 >
-> **Why this matters beyond Module 3:** the README's "2018-2024 age gap
-> -- RESOLVED" note (Module 2, Known gaps) may have only fixed *age
-> values* for players already present in the dataset, without addressing
-> players who debuted 2018+ and were never scraped/added at all -- a
-> different, more fundamental gap. If true, this also means the Module 2
-> aging-curve work's "2005-2024 reference window," treated throughout the
-> fitting-window investigation as trustworthy modern data, was likely
-> built on a meaningfully thinner dataset for its most recent ~6-7
-> years than assumed. **Not yet confirmed whether this changes any
-> Module 2 conclusions -- needs investigation before trusting it either
-> way.**
+> `missing_age_players.csv` and `merge_missing_ages.py` (the old
+> birthdate-based patch step this replaced) are retired.
 >
-> **Not yet root-caused.** Two live hypotheses, neither confirmed:
-> 1. The underlying source data (`historical_clean.csv` /
->    `recent_aggregated.csv` / whatever feeds 2018+) simply stops
->    including new players around 2018.
-> 2. Some processing step in the `aging/` pipeline (`build_player_dataset.py`,
->    `rebuild_unified.py`, `attach_player_ids.py`, etc.) silently drops
->    or filters out new 2018+ debuts.
->
-> **Next step for whoever picks this up:** trace where 2018+ debuts
-> disappear -- start by checking whether `recent_aggregated.csv` /
-> `recent_with_age.csv` (the raw pre-pipeline sources) contain Bam
-> Adebayo and other known 2018+ debuts at all. If yes, the bug is in the
-> pipeline. If no, the bug (or a real source-data limitation) is
-> upstream of this project entirely.
+> **Downstream fallout also resolved:** `player_metrics.csv` was
+> separately found to be missing its `player_id` column because
+> `compute_metrics.py` had been run *before* `attach_player_ids.py`
+> instead of after -- correct pipeline order is
+> `build_player_dataset.py` → `attach_player_ids.py` → `compute_metrics.py`.
+> Module 3's draft-to-player_id matcher (`match_draft_to_player_ids.py`)
+> was rebuilt (see that section below) and now matches 3,516 of 8,169
+> draft picks (43.0%), up from the pre-fix 3,097 (37.9%).
 
 A from-scratch system to project next season's NBA standings using
 historical aging/minutes curves, offseason transactions, and Monte Carlo
@@ -68,13 +58,15 @@ NBA_Projector/
 │   ├── real_schedule.py           <- loader for the real 2025-26 schedule
 │   ├── real_schedule_2025_26.json <- real 2025-26 schedule data (1,200 games)
 │   └── real_pfpa_2025_26.py       <- real 2025-26 points-for/points-against per team
-└── aging/                         <- Module 2's code + data
-    ├── build_player_dataset.py       <- from-scratch build (TOT-collapse bug fixed this session)
-    ├── merge_missing_ages.py
+└── aging/                         <- Module 2's + Module 3's code + data
+    ├── build_player_dataset.py       <- from-scratch build; 2018+ age assignment
+    │                                     now via direct lookup against
+    │                                     AllPlayerDataforIDs.txt (see banner above)
     ├── recover_collision_rows.py     <- patches historical_clean.csv (TOT-collapse fix)
     ├── rebuild_unified.py            <- regenerates unified_player_seasons.csv
     ├── patch_pre1958_ages.py         <- fills the 6 pre-1958 missing ages
-    ├── attach_player_ids.py          <- attaches player_id, corrects ages (3-pass match)
+    ├── attach_player_ids.py          <- attaches player_id, corrects ages (5-pass match)
+    │                                     -- MUST run before compute_metrics.py
     ├── compute_metrics.py            <- per-36 rates, TS%, era z-scores/ratios
     ├── delta_curves_exploratory.py   <- delta-method exploration, n>=20 cutoff
     ├── delta_curves_era_compare.py   <- early era-window divergence test (superseded, kept for record)
@@ -85,14 +77,11 @@ NBA_Projector/
     ├── historical_clean.csv
     ├── recent_aggregated.csv
     ├── recent_with_age.csv
-    ├── missing_age_players.csv
     ├── unified_player_seasons.csv    <- the actual working dataset
-    ├── player_metrics.csv            <- unified + all computed metric columns
-    ├── player_id_lookup.csv          <- full 1947-2026 player ID lookup (project owner-provided)
+    ├── player_metrics.csv            <- unified + all computed metric columns + player_id
     ├── player_id_seasons.csv         <- full 1947-2026 player-season ID+age+team data
     ├── source_age_data_1947_2026.csv
-    └── recovered_birthdates_balkan_names.csv
-└── draft/                          <- Module 3's code + data (NEW this session)
+    ├── recovered_birthdates_balkan_names.csv
     ├── build_draft_history.py        <- parses all 77 yearly draft CSVs (from
     │                                     github.com/thomassutton-afk/NBA_Projector/draft_data)
     │                                     into one combined table
@@ -100,37 +89,40 @@ NBA_Projector/
     ├── match_draft_to_player_ids.py  <- matches draft picks to player_id via each
     │                                     player's rookie season in player_metrics.csv
     ├── draft_rookie_seasons.csv      <- output: successfully-matched picks + rookie z-scores
-    └── draft_unmatched.csv           <- output: unmatched picks, flagged for review
-                                          (currently where the critical issue above was found)
+    └── draft_unmatched.csv           <- output: unmatched picks, with a reason code
+                                          (no career / no data yet / no name match /
+                                          gap exceeds threshold / ambiguous candidates)
+├── AllPlayerDataforIDs.txt        <- full-history (1947-2026) name/age/team roster,
+│                                     project-owner-provided; used directly by
+│                                     build_player_dataset.py for 2018+ age lookup
+└── player_id_lookup.csv           <- full 1947-2026 player ID lookup, one row per
+                                        player (project owner-provided)
 ```
 
 ---
 
-## Status: Module 1 & 2 complete, Module 3 in progress (BLOCKED -- see
-critical issue banner at top of file)
+## Status: Module 1 & 2 complete, Module 3 in progress
 
 The overall project is being built in this order (see full reasoning
 in the "Build order" section below):
 
 - [x] **1. Simulation engine (Monte Carlo)** -- DONE, validated
 - [x] **2. Aging curve model** -- DONE. Full data foundation (unified
-      player-season dataset, 1950-2024, 22,094 player-seasons, 100%
-      age/player_id coverage), metric computation (validated against
+      player-season dataset, 1950-2024, 24,164 player-seasons, 100%
+      age coverage / 99.9% player_id coverage), metric computation (validated against
       pre-built advanced stats), category-specific fitting-window
       selection (empirically tested, not assumed), and the actual
       delta-method aging curves (all 8 categories, extrapolated tails,
       independently verified) are all built and confirmed. Full
       methodology documented in the Module 2 section below. Deliberately
       deferred: height/weight data, survival/retention curve (see Known
-      gaps). **Caveat as of this session: the critical issue banner
-      above may mean Module 2's curves were built on thinner-than-assumed
-      2018-2024 data -- not yet confirmed either way.**
-- [ ] **3. Rookie / new-player projection model** -- IN PROGRESS,
-      BLOCKED. Draft history parsed and verified (8,169 picks,
-      1950-2026). Draft-to-player_id matching built and tested -- but
-      surfaced the critical player-coverage gap described at the top of
-      this file. Paused here pending investigation of that gap before
-      continuing -- see Module 3 section below for full detail.
+      gaps).
+- [ ] **3. Rookie / new-player projection model** -- IN PROGRESS.
+      Draft history parsed and verified (8,169 picks, 1950-2026).
+      Draft-to-player_id matching built, tested, and confirmed: 3,516
+      of 8,169 picks matched (43.0%). Remaining work: resolve 19
+      ambiguous name-collision candidates and 8 true no-name-match
+      picks by hand -- see Module 3 section below for full detail.
 - [ ] 4. Data foundation (rosters, transactions, current stats)
 - [ ] 5. Minutes / rotation model
 - [ ] 6. Team aggregation model (player values -> team point differential)
@@ -386,11 +378,24 @@ correctly, because the bad anchor match looked like a valid answer.
    confirmed by an exact age match (same year, same age) before being
    added, not just a plausible-looking name.
 
-**Result: 100.00% of all 22,094 rows matched to a stable player_id** --
-fully complete, no exceptions. This includes all 77 corrections from
-the assign_ages() bug (all now fixed) and fully resolves every one of
-the project's ~26 documented name-collision player-seasons with a
-correct, evidence-backed player_id per row.
+**Result at the time (22,094 rows, pre-2018+ coverage fix): 100.00%
+matched to a stable player_id** -- fully complete, no exceptions. This
+included all 77 corrections from the assign_ages() bug (now fixed) and
+fully resolved every one of the project's ~26 documented
+name-collision player-seasons with a correct, evidence-backed
+player_id per row.
+
+**Updated result after the 2018+ coverage-gap fix added 2,070 new
+rows (24,164 total): 99.9% matched (24,130 of 24,164).** The 753
+newly-recovered players re-introduced a small number of the same
+initials/nickname mismatch patterns this section describes (e.g. `AJ
+Green`, `JJ Redick`, `O.G. Anunoby`, `Cam Reynolds`) -- 34 rows,
+concentrated in players' most recent 2018-2024 seasons specifically
+(their earlier seasons, if any, already matched correctly), still need
+the same kind of manual research described above. Full list in
+`attach_player_ids.py`'s run output. Does not affect the Module 3
+draft-matching results below, since those rely on each player's
+*rookie* season, which already has a valid ID for all of these cases.
 
 **Three names resolved via direct web research this session** (not
 findable through any automated name-normalization rule, but real,
@@ -418,16 +423,11 @@ searches" conclusion isn't the same as "unfindable."
 **Module 2 data engineering + metric computation: DONE.** Everything
 below this line is already built, run, and independently verified by
 the project owner on their own machine:
-- `unified_player_seasons.csv`: 22,094 player-seasons, 1950-2024, 100%
-  age coverage, 100% player_id coverage -- **caveat added this session:
-  see the CRITICAL OPEN ISSUE banner at the top of this file.** Age/ID
-  coverage among rows that exist was confirmed 100% -- but there's now
-  real suspicion that a meaningful number of rows for players who
-  debuted 2018+ may be missing entirely (a coverage gap, not an
-  age/ID gap). Not yet confirmed whether this affects
-  `unified_player_seasons.csv` itself or was introduced somewhere later
-  in the pipeline -- see the banner for the investigation starting
-  point.
+- `unified_player_seasons.csv`: 24,164 player-seasons, 1950-2024, 100%
+  age coverage, 99.9% player_id coverage. The 2018+ player-coverage gap
+  discovered during Module 3 work (753 players, including Bam Adebayo,
+  previously excluded entirely) is now resolved -- see the RESOLVED
+  banner at the top of this file for root cause and fix.
 - `player_metrics.csv`: per-36 rates, TS%, era z-scores/ratios for 8
   core categories, cross-checked against pre-built PER/TS%/WS/BPM
   (TS% matches to within 0.0005; Spearman correlations all positive
@@ -457,25 +457,30 @@ for reasoning -- the continuous per-category scan already tested this
 question more thoroughly than three discrete candidate years would
 have, and found no category needed a boundary anywhere near 2000-2015.
 
-**Module 2 status: DONE**, with the caveat noted above about the
-critical open issue. The survival/retention question (below) remains
-deliberately deferred, not blocking.
+**Module 2 status: DONE.** The survival/retention question (below)
+remains deliberately deferred, not blocking.
 
-**Module 3 status: IN PROGRESS, PAUSED.** See the full "Module 3"
-section further down for what's built (`draft_history.csv`,
-`match_draft_to_player_ids.py`) and exactly how the critical issue at
-the top of this file was discovered. **Next step for whoever picks this
-up: root-cause the 2018+ player-coverage gap before resuming Module 3
-matching work or trusting Module 2's 2005-2024 reference window.**
+**Module 3 status: IN PROGRESS.** See the full "Module 3" section
+further down for what's built (`draft_history.csv`,
+`match_draft_to_player_ids.py`) and how the 2018+ player-coverage gap
+(see resolved banner at top of file) was originally discovered through
+this work. Current match rate: 3,516 of 8,169 picks (43.0%). **Next
+step: resolve the remaining 19 ambiguous name-collision candidates and
+8 true no-name-match picks flagged in `draft_unmatched.csv`, then
+continue Module 3.**
 
 
 
-Run from `aging/`, after `unified_player_seasons.csv` exists:
+Run from `aging/`, **after `attach_player_ids.py`** (order matters --
+`compute_metrics.py` just preserves whatever columns are already on
+`unified_player_seasons.csv`; running it before `attach_player_ids.py`
+silently produces a `player_metrics.csv` with no `player_id` column):
 ```
+python attach_player_ids.py
 python compute_metrics.py
 ```
 Reads `unified_player_seasons.csv`, writes `player_metrics.csv`
-(22,090 rows, 69 columns) with:
+(24,164 rows, 70 columns) with:
 
 - **Per-36 rate stats** for every counting stat (PTS, TRB, ORB, DRB,
   AST, STL, BLK, TOV, PF, FG, FGA, 3P, 3PA, FT, FTA), computed directly
@@ -1000,7 +1005,7 @@ unknown offseason:
 
 ---
 
-## Module 3: Rookie / New-Player Projection (in progress -- BLOCKED)
+## Module 3: Rookie / New-Player Projection (in progress)
 
 ### What it will do (once complete)
 
@@ -1064,15 +1069,27 @@ local `draft_data/` copy needed):
 python build_draft_history.py
 ```
 
-### Draft-to-player_id matching (`match_draft_to_player_ids.py`) -- BUILT, TESTED, SURFACED THE CRITICAL ISSUE
+### Draft-to-player_id matching (`match_draft_to_player_ids.py`) -- REBUILT, MATCH RATE CONFIRMED
 
-**Approach:** for each player_id in `player_metrics.csv`, extract their
-rookie season (earliest `SeasonStart`). Match `draft_history.csv`'s
-`Player` name against that rookie-season lookup's `PlayerName`, using
-normalized names (lowercase, diacritics stripped via `unidecode`,
+**Approach:** for each `player_id` in `player_metrics.csv`, extract
+their rookie season (earliest `SeasonStart`). Match `draft_history.csv`'s
+`Player` name against that rookie-season lookup, trying **two name
+sources** per candidate:
+1. `PlayerName` from `player_metrics.csv` itself (the original name as
+   it appears in the historical box score source -- occasionally
+   truncated for multi-word surnames, e.g. `"Dick Van"` for `"Dick Van
+   Arsdale"`)
+2. `display_name` from `player_id_lookup.csv` (the canonical current
+   name) -- catches players whose historical `PlayerName` predates a
+   legal name change or uses an old/anglicized spelling the draft file
+   doesn't (e.g. `"Enes Kanter"` -> draft file has `"Enes Freedom"`;
+   `"Nene Hilario"` -> draft file has `"Nenê"`; `"Efthimi Rentzias"` ->
+   draft file has `"Efthimios Rentzias"`)
+
+Normalized names (lowercase, diacritics stripped via `unidecode`,
 Jr./Sr./II/III/IV suffixes dropped, punctuation/asterisks stripped --
-same HOF-asterisk convention as Module 2) and `draft_year` proximity to
-the rookie season to disambiguate players who share a name.
+same HOF-asterisk convention as Module 2) plus `draft_year` proximity
+to the rookie season disambiguate players who share a name.
 
 **Bug caught and fixed during review:** the first version of the name
 normalizer stripped periods/apostrophes/hyphens but not the trailing
@@ -1091,47 +1108,64 @@ overseas). **Confirmed these are real gaps, not bugs**, by checking
 specific cases directly against the raw source (e.g. George Yardley:
 drafted 1950, debut 1954; Cliff Hagan: drafted 1953, debut 1957).
 **Also confirmed a small number of much longer gaps (20-30 years) are
-NOT real -- they're two different players sharing a name decades
-apart**, and widening the threshold to cover those would cause
-*wrong* matches. **Decision (project owner's call):** widen the
-threshold to 9 years -- catches the legitimate 4-9 year era-specific
-gaps while staying well clear of the 20-30 year collision cases.
+NOT real** -- they're two different players sharing a name decades
+apart -- and widening the threshold to cover those would cause *wrong*
+matches. **Decision (project owner's call):** widen the threshold to 9
+years -- catches the legitimate 4-9 year era-specific gaps while
+staying well clear of the 20-30 year collision cases. A handful of
+real players still exceed even 9 years (Arvydas Sabonis: drafted
+1985/86, NBA debut 1995-96, an 11-year gap caused by being unable to
+leave the Soviet/Lithuanian system) -- these are correctly name-matched
+but flagged separately as `"gap exceeds threshold"` rather than
+silently forced through, since loosening the threshold further to
+catch them would risk re-introducing false collisions elsewhere.
 
-**How the critical issue was found:** even after both fixes above,
+**How the 2018+ coverage gap was found:** while testing this script,
 732 draft picks with a real, confirmed NBA career (per the draft
 file's own career-totals columns) still failed to match. Investigating
 a random sample of the "no name match at all" subset (549 of the 732)
 found 94% clustered in 2010-2026 draft years, and the sample included
 unmistakably active, well-known players (Bam Adebayo, Nic Claxton,
-Onyeka Okongwu, etc.) -- this ruled out "obscure name formatting" as
-the explanation. Checked `player_metrics.csv` directly: **Bam Adebayo
-does not appear anywhere in it.** Checked new-player-debuts-per-season
-and found a sharp cliff at 2018 (see the critical issue banner at the
-top of this file for the full numbers). **This is a data-completeness
-problem in `player_metrics.csv` (and likely `unified_player_seasons.csv`
-beneath it), not a matching-logic problem** -- confirmed by testing
-against the project owner's current, freshly-re-exported
-`player_metrics.csv` (row count and unique-player count matched the
-documented Module 2 figures exactly, ruling out "stale file" as the
-explanation).
+Onyeka Okongwu, etc.). Checked `player_metrics.csv` directly: **Bam
+Adebayo did not appear anywhere in it.** That led to the root-cause
+investigation and fix described in the resolved banner at the top of
+this file.
 
-**Current output, PAUSED pending the critical issue investigation:**
-- `draft_rookie_seasons.csv`: 3,097 successfully-matched picks (of
-  8,169 total; ~3,658 of the unmatched remainder never played an NBA
-  game at all, which is expected and correct -- not a matching failure)
-- `draft_unmatched.csv`: remaining unmatched picks, for review -- this
-  is where the coverage gap was discovered and where investigation
-  should resume once the critical issue is resolved
+**Final results, after the coverage-gap fix + the two-name-source
+matching above:**
+- `draft_rookie_seasons.csv`: **3,516 of 8,169 picks matched (43.0%)**,
+  up from 3,097 (37.9%) pre-fix
+- `draft_unmatched.csv`: 4,653 unmatched, broken out by reason:
+  - **4,442 "no career"** -- drafted but never played an NBA game;
+    expected, not a matching failure
+  - **177 "no data yet (post-2024 draft class)"** -- `player_metrics.csv`'s
+    box-score source currently only extends through `SeasonStart 2024`
+    (the 2023-24 season); 2024 and 2025 draft picks have no possible
+    rookie-season row yet
+  - **19 "ambiguous candidates"** -- name matched 2+ players, none
+    resolved by the 9-year gap rule (real same-name-different-person
+    collisions: Charles Jones, Charles Smith, Eddie Johnson, George
+    Johnson, Marcus Williams, Mike/Mark Davis, Jack Turner, Michael
+    Smith); flagged for manual review, not auto-resolved
+  - **7 "gap exceeds threshold"** -- name matched, but the real-world
+    gap exceeds 9 years (Sabonis x2, plus 4 ABA-era draftees who played
+    in the ABA before their NBA debut, plus Vasilije Mićić); flagged
+    for manual review rather than silently forced through
+  - **8 "no name match"** -- true residual gap, needs manual research:
+    Al McGuire (1951), Billy McGill (1962), Michael Ray Richardson
+    (1978), Vince Edwards (2018), KJ Martin (2020), Karlo Matković
+    (2022), Luke Travers (2022), Jaylen Clark (2023)
 
-**Do not treat the current match rate (37.9%) as representative of
-matching-logic quality** -- a large chunk of the "unmatched" total is
-players who never played in the NBA at all (expected), and another
-large chunk is the 2018+ coverage gap (not a matching problem). The
-real matching-logic performance can't be assessed until the coverage
-gap is fixed and the match is re-run.
+**Separately found and fixed:** `player_metrics.csv` was missing its
+`player_id` column because `compute_metrics.py` had been run before
+`attach_player_ids.py` -- see the pipeline-order note in the Module 2
+section above.
 
-Run from a folder containing both `draft_history.csv` and
-`player_metrics.csv`:
+**Next step: resolve the 19 ambiguous + 8 no-name-match cases above by
+hand**, then Module 3 continues (rookie-season-to-draft-slot priors).
+
+Run from `aging/` (needs `draft_history.csv` and `player_metrics.csv`
+in that folder, and `player_id_lookup.csv` at the project root):
 ```
 python match_draft_to_player_ids.py
 ```
