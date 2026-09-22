@@ -91,6 +91,8 @@ VERIFIED_ALIASES = {
     "Wayne Englestad": "Wayne Engelstad",
     "Sheldon McClellan": "Sheldon Mac",
     "Nate Williams": "Jeenathan Williams",
+    "Michael Ray Richardson": "Micheal Ray Richardson",
+    "Vincent Edwards": "Vince Edwards",
 }
 
 # Rows confirmed to carry a KNOWN-WRONG age from the assign_ages() bug
